@@ -1,0 +1,7 @@
+{
+  "name": "Zen - Personal AI Knowledge Assistant",
+  "description": "Zen is an AI-powered assistant that ingests your documents and provides conversational access to your personal knowledge base, ensuring privacy and accuracy through a Retrieval-Augmented Generation (RAG) system.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
