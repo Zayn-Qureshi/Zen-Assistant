@@ -1,24 +1,40 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import path from 'path';
 
+// Vite config
 export default defineConfig(({ mode }) => {
-    return {
-        // 1. ADD BASE PATH FOR DEPLOYMENT (use './' for safest static hosting)
-        base: './', 
-        
-        server: {
-            port: 3000,
-            host: '0.0.0.0',
+  return {
+    base: './', // Safe for static hosting
+
+    server: {
+      port: 3000,
+      host: '0.0.0.0',
+    },
+
+    plugins: [react()],
+
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, './src'),
+      },
+    },
+
+    build: {
+      // Split large chunks automatically
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules')) {
+              if (id.includes('react')) return 'vendor-react';
+              if (id.includes('pdfjs-dist')) return 'vendor-pdfjs';
+              if (id.includes('mammoth')) return 'vendor-mammoth';
+              return 'vendor';
+            }
+          },
         },
-        plugins: [react()],
-        
-        // 2. REMOVE the unnecessary 'define' block. Vite handles VITE_ variables automatically.
-        
-        // You might use 'resolve.alias' later, but for now, we'll keep it simple.
-        // resolve: {
-        //   alias: {
-        //     '@': path.resolve(__dirname, '.'),
-        //   }
-        // }
-    };
+      },
+      chunkSizeWarningLimit: 1000, // Increase to suppress warnings for large chunks
+    },
+  };
 });

@@ -69,19 +69,19 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatHistory, isLoading, allChun
 
   return (
     <>
-      <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-8">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 sm:space-y-8">
         {chatHistory.map((msg) => {
           const parsed = msg.sender === MessageSender.BOT ? parseMessage(msg.text) : null;
           return (
-            <div key={msg.id} className={`flex items-start gap-3 md:gap-4 ${msg.sender === MessageSender.USER ? 'justify-end' : ''}`}>
+            <div key={msg.id} className={`flex items-start gap-2.5 sm:gap-4 ${msg.sender === MessageSender.USER ? 'justify-end' : ''}`}>
               {msg.sender === MessageSender.BOT && (
-                <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0 border border-gray-300">
-                  <ZenLogo className="w-5 h-5 md:w-6 md:h-6 text-blue-600" />
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0 border border-gray-300">
+                  <ZenLogo className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
                 </div>
               )}
-              <div className={`p-3 md:p-4 rounded-xl max-w-xl shadow-sm ${msg.sender === MessageSender.USER ? 'bg-blue-500 text-white' : 'bg-white text-gray-800 border border-gray-200'}`}>
+              <div className={`p-3 sm:p-4 rounded-xl max-w-lg shadow-sm ${msg.sender === MessageSender.USER ? 'bg-blue-500 text-white' : 'bg-white text-gray-800 border border-gray-200'}`}>
                 <div 
-                  className="prose prose-sm text-gray-800 leading-relaxed whitespace-pre-wrap"
+                  className="prose prose-sm sm:prose-base text-gray-800 leading-relaxed whitespace-pre-wrap"
                   onClick={handleMessageClick}
                   dangerouslySetInnerHTML={ msg.sender === MessageSender.USER ? {__html: msg.text} : parsed?.__html ? {__html: parsed.__html } : undefined}
                 >
@@ -89,7 +89,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatHistory, isLoading, allChun
                 </div>
 
                 {msg.sender === MessageSender.BOT && parsed && parsed.sources.length > 0 && (
-                  <div className="mt-4 pt-3 border-t border-gray-200">
+                  <div className="mt-3 sm:mt-4 pt-3 border-t border-gray-200">
                       <h4 className="text-xs font-semibold text-gray-500 mb-2">Sources</h4>
                       <ul className="space-y-1">
                           {parsed.sources.map(source => (
@@ -107,19 +107,19 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ chatHistory, isLoading, allChun
                 )}
               </div>
               {msg.sender === MessageSender.USER && (
-                <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0 border border-gray-300">
-                  <UserIcon className="w-5 h-5 md:w-6 md:h-6 text-gray-500" />
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0 border border-gray-300">
+                  <UserIcon className="w-5 h-5 sm:w-6 sm:h-6 text-gray-500" />
                 </div>
               )}
             </div>
           )
         })}
         {isLoading && (
-          <div className="flex items-start gap-3 md:gap-4">
-            <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0 border border-gray-300">
-              <ZenLogo className="w-5 h-5 md:w-6 md:h-6 text-blue-600" />
+          <div className="flex items-start gap-2.5 sm:gap-4">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0 border border-gray-300">
+              <ZenLogo className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
             </div>
-            <div className="p-4 rounded-xl bg-white border border-gray-200 flex items-center space-x-2">
+            <div className="p-3 sm:p-4 rounded-xl bg-white border border-gray-200 flex items-center space-x-2">
               <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse [animation-delay:-0.3s]"></div>
               <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse [animation-delay:-0.15s]"></div>
               <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>

@@ -127,22 +127,22 @@ const ZenApp: React.FC<ZenAppProps> = (props) => {
   return (
     <div className="relative h-screen w-full flex flex-col font-sans bg-gray-100">
       <div className="absolute inset-0 hex-bg z-0"></div>
-      <div className="relative flex-1 flex flex-col max-w-3xl w-full mx-auto pb-24">
-        <header className="pt-8 pb-6 px-4 text-center">
+      <div className="relative flex-1 flex flex-col max-w-4xl w-full mx-auto pb-28 sm:pb-24 px-2 sm:px-4">
+        <header className="pt-6 sm:pt-8 pb-4 sm:pb-6 px-2 sm:px-4 text-center">
             <h1 className="font-serif text-4xl md:text-5xl font-bold text-gray-800">Zen Assistant</h1>
             <p className="text-gray-500 mt-2">Hello! I'm Zen, your AI knowledge partner. How can I help you learn today?</p>
         </header>
 
-        <div className="px-4 mb-4 flex justify-center items-center gap-4">
+        <div className="px-2 sm:px-4 mb-4 flex justify-center items-center gap-2 sm:gap-4">
             <div className="bg-white p-1 rounded-full shadow-sm border border-gray-200 flex items-center">
-                <button onClick={() => setView('chat')} className={`px-4 py-1.5 text-sm font-semibold rounded-full transition-colors ${view === 'chat' ? 'bg-blue-500 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
+                <button onClick={() => setView('chat')} className={`px-3 sm:px-4 py-1.5 text-sm font-semibold rounded-full transition-colors ${view === 'chat' ? 'bg-blue-500 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
                     Chat
                 </button>
-                <button onClick={() => setView('sources')} className={`px-4 py-1.5 text-sm font-semibold rounded-full transition-colors ${view === 'sources' ? 'bg-blue-500 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
+                <button onClick={() => setView('sources')} className={`px-3 sm:px-4 py-1.5 text-sm font-semibold rounded-full transition-colors ${view === 'sources' ? 'bg-blue-500 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
                     Sources
                 </button>
             </div>
-            <button onClick={() => setView('sources')} className="p-2.5 rounded-full bg-white shadow-sm border border-gray-200 text-gray-500 hover:bg-gray-100 hover:text-blue-600 transition-colors">
+            <button onClick={() => setView('sources')} className="p-2 sm:p-2.5 rounded-full bg-white shadow-sm border border-gray-200 text-gray-500 hover:bg-gray-100 hover:text-blue-600 transition-colors">
                 <SearchSourceIcon className="w-5 h-5"/>
             </button>
         </div>
@@ -162,24 +162,24 @@ const ZenApp: React.FC<ZenAppProps> = (props) => {
         )}
       </div>
 
-      <footer className="fixed bottom-0 left-0 right-0 p-4 bg-gray-100/80 backdrop-blur-sm border-t border-gray-200 z-10">
-          <div className="max-w-3xl mx-auto">
+      <footer className="fixed bottom-0 left-0 right-0 p-2 sm:p-4 bg-gray-100/80 backdrop-blur-sm border-t border-gray-200 z-10">
+          <div className="max-w-4xl mx-auto">
             <form onSubmit={handleSendMessage} className="relative">
                 <input
                     type="text"
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     placeholder={isListening ? "Listening..." : "Ask me anything..."}
-                    className="w-full pl-12 pr-24 py-3.5 bg-white border border-gray-300 rounded-full shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all text-gray-800 placeholder-gray-400"
+                    className="w-full pl-10 sm:pl-12 pr-20 sm:pr-24 py-3 sm:py-3.5 bg-white border border-gray-300 rounded-full shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all text-gray-800 placeholder-gray-400"
                     disabled={props.isBotLoading}
                 />
-                <div className="absolute inset-y-0 left-0 flex items-center pl-3">
+                <div className="absolute inset-y-0 left-0 flex items-center pl-2 sm:pl-3">
                     <button type="button" onClick={handleFileIconClick} className="p-2 rounded-full text-gray-500 hover:bg-gray-200 hover:text-blue-600 transition-colors">
-                        <AddIcon className="w-6 h-6"/>
+                        <AddIcon className="w-5 h-5 sm:w-6 sm:h-6"/>
                     </button>
                     <input ref={fileInputRef} type="file" className="hidden" multiple onChange={handleFileChange} disabled={props.isProcessingFiles} accept=".pdf,.docx,.txt,.md,.eml" />
                 </div>
-                <div className="absolute inset-y-0 right-0 flex items-center pr-3 space-x-1">
+                <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:pr-3 space-x-0.5 sm:space-x-1">
                     {recognitionRef.current && (
                       <button
                         type="button"
@@ -187,7 +187,7 @@ const ZenApp: React.FC<ZenAppProps> = (props) => {
                         className={`p-2 rounded-full transition-colors ${isListening ? 'text-red-500 animate-pulse' : 'text-gray-500 hover:bg-gray-200 hover:text-blue-600'}`}
                         aria-label={isListening ? "Stop listening" : "Start listening"}
                       >
-                        <MicrophoneIcon className="w-6 h-6" />
+                        <MicrophoneIcon className="w-5 h-5 sm:w-6 sm:h-6" />
                       </button>
                     )}
                     <button
@@ -196,7 +196,7 @@ const ZenApp: React.FC<ZenAppProps> = (props) => {
                     className="p-2 rounded-full text-gray-500 disabled:text-gray-300 disabled:cursor-not-allowed hover:bg-blue-100 hover:text-blue-600 transition-colors"
                     aria-label="Send message"
                     >
-                    <SendIcon className="w-6 h-6" />
+                    <SendIcon className="w-5 h-5 sm:w-6 sm:h-6" />
                     </button>
                 </div>
             </form>
