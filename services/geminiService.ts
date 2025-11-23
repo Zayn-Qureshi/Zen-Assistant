@@ -1,6 +1,6 @@
 // services/geminiService.ts
 import { GoogleGenAI } from "@google/genai";
-import type { Chunk } from "../types";
+import type { Chunk, ChatMessage } from "../types";
 
 // Read API key
 const apiKey = import.meta.env.VITE_GOOGLE_API_KEY as string;
@@ -13,7 +13,8 @@ const genAI = new GoogleGenAI({ apiKey });
 
 export const getAnswerFromContext = async (
   query: string,
-  contextChunks: Chunk[]
+  contextChunks: Chunk[],
+  chatHistory: ChatMessage[] = []
 ): Promise<string> => {
   // Build context for RAG
   const context = contextChunks
@@ -22,6 +23,12 @@ export const getAnswerFromContext = async (
         `[Source ${i + 1} - ${chunk.documentName}]:\n${chunk.content}`
     )
     .join("\n\n---\n\n");
+
+  // Format recent chat history (last 5 messages)
+  const recentHistory = chatHistory
+    .slice(-5)
+    .map(msg => `${msg.sender === 'user' ? 'User' : 'Zen'}: ${msg.text}`)
+    .join('\n');
 
   const prompt = `
 You are Zen, an intelligent AI knowledge assistant.
@@ -32,6 +39,9 @@ If the answer is not present, say:
 
 Context:
 ${context}
+
+Chat History:
+${recentHistory}
 
 User Question:
 ${query}

@@ -4,6 +4,14 @@ import type { Document, Chunk, ChatMessage } from './types';
 import { MessageSender } from './types';
 import { chunkText, retrieveRelevantChunks } from './utils/textProcessor';
 import { getAnswerFromContext } from './services/geminiService';
+import {
+  saveDocuments,
+  loadDocuments,
+  saveChunks,
+  loadChunks,
+  saveChatHistory,
+  loadChatHistory
+} from './services/storageService';
 import * as pdfjsLib from 'pdfjs-dist';
 import ZenApp from './components/ZenApp';
 import LandingPage from './components/LandingPage';
@@ -12,21 +20,24 @@ import LandingPage from './components/LandingPage';
 declare const mammoth: any;
 
 // Set PDF.js worker
-pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
+import pdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
+
+// Set PDF.js worker
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
 
 // ==========================================
 // FILE TEXT EXTRACTION
 // ==========================================
 const extractTextFromFile = async (file: File): Promise<string> => {
   const extension = file.name.split('.').pop()?.toLowerCase();
-  
+
   switch (extension) {
     case 'pdf': {
       try {
         const arrayBuffer = await file.arrayBuffer();
         const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
         const pdf = await loadingTask.promise;
-        
+
         let textContent = '';
         for (let i = 1; i <= pdf.numPages; i++) {
           const page = await pdf.getPage(i);
@@ -36,14 +47,14 @@ const extractTextFromFile = async (file: File): Promise<string> => {
             .join(' ');
           textContent += pageText + '\n';
         }
-        
+
         return textContent.trim();
       } catch (error) {
         console.error('PDF extraction error:', error);
         throw new Error('Failed to extract text from PDF');
       }
     }
-    
+
     case 'docx': {
       try {
         const arrayBuffer = await file.arrayBuffer();
@@ -54,12 +65,12 @@ const extractTextFromFile = async (file: File): Promise<string> => {
         throw new Error('Failed to extract text from DOCX');
       }
     }
-    
+
     case 'txt':
     case 'md':
     case 'eml':
       return file.text();
-    
+
     default:
       throw new Error(`Unsupported file type: .${extension}`);
   }
@@ -81,6 +92,43 @@ const App: React.FC = () => {
   };
 
   // ==========================================
+  // PERSISTENCE (Load & Save)
+  // ==========================================
+
+  // Load data on startup
+  React.useEffect(() => {
+    const init = async () => {
+      try {
+        const [docs, chks, hist] = await Promise.all([
+          loadDocuments(),
+          loadChunks(),
+          loadChatHistory()
+        ]);
+
+        if (docs.length > 0) setDocuments(docs);
+        if (chks.length > 0) setChunks(chks);
+        if (hist.length > 0) setChatHistory(hist);
+      } catch (error) {
+        console.error("Failed to load data from storage:", error);
+      }
+    };
+    init();
+  }, []);
+
+  // Save data when it changes
+  React.useEffect(() => {
+    saveDocuments(documents);
+  }, [documents]);
+
+  React.useEffect(() => {
+    saveChunks(chunks);
+  }, [chunks]);
+
+  React.useEffect(() => {
+    saveChatHistory(chatHistory);
+  }, [chatHistory]);
+
+  // ==========================================
   // FILE UPLOAD HANDLER
   // ==========================================
   const handleFileUpload = useCallback(async (files: FileList) => {
@@ -93,22 +141,22 @@ const App: React.FC = () => {
       try {
         console.log(`Processing: ${file.name}`);
         const text = await extractTextFromFile(file);
-        
+
         // Validate extracted text
         if (!text || text.trim().length === 0) {
           throw new Error('No text extracted from file');
         }
-        
+
         console.log(`Extracted ${text.length} characters from ${file.name}`);
-        
+
         const docId = `doc-${documents.length + newDocs.length + 1}`;
-        const newDoc: Document = { 
-          id: docId, 
-          name: file.name, 
-          content: text 
+        const newDoc: Document = {
+          id: docId,
+          name: file.name,
+          content: text
         };
         newDocs.push(newDoc);
-        
+
         // Create chunks with proper structure
         const docChunks = chunkText(docId, file.name, text);
         console.log(`Created ${docChunks.length} chunks for ${file.name}`);
@@ -122,7 +170,7 @@ const App: React.FC = () => {
     setDocuments(prev => [...prev, ...newDocs]);
     setChunks(prev => [...prev, ...newChunks]);
     setIsProcessingFiles(false);
-    
+
     // Send feedback messages
     const messagesToAdd: ChatMessage[] = [];
     if (newDocs.length > 0) {
@@ -150,7 +198,7 @@ const App: React.FC = () => {
   // ==========================================
   const handleSendMessage = useCallback(async (message: string) => {
     setIsBotLoading(true);
-    
+
     const userMessage: ChatMessage = {
       id: `msg-${Date.now()}`,
       sender: MessageSender.USER,
@@ -176,13 +224,13 @@ const App: React.FC = () => {
     console.log(`Found ${relevantChunks.length} relevant chunks`);
 
     let botResponseText: string;
-    
+
     if (relevantChunks.length === 0) {
       botResponseText = "I couldn't find relevant information in your documents for that query. Try rephrasing your question or upload more documents.";
     } else {
-      botResponseText = await getAnswerFromContext(message, relevantChunks);
+      botResponseText = await getAnswerFromContext(message, relevantChunks, chatHistory);
     }
-    
+
     const botMessage: ChatMessage = {
       id: `msg-${Date.now() + 1}`,
       sender: MessageSender.BOT,
@@ -191,7 +239,7 @@ const App: React.FC = () => {
 
     setChatHistory(prev => [...prev, botMessage]);
     setIsBotLoading(false);
-  }, [chunks]);
+  }, [chunks, chatHistory]);
 
   if (showLandingPage) {
     return <LandingPage onGetStarted={handleGetStarted} />;
