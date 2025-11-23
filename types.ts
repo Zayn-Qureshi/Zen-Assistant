@@ -10,6 +10,7 @@ export interface Chunk {
   documentId: string;
   documentName: string;
   content: string;
+  embedding?: number[];
 }
 
 export enum MessageSender {

@@ -11,6 +11,19 @@ if (!apiKey || apiKey === "undefined") {
 
 const genAI = new GoogleGenAI({ apiKey });
 
+export const getEmbedding = async (text: string): Promise<number[] | undefined> => {
+  try {
+    const result = await genAI.models.embedContent({
+      model: "models/text-embedding-004",
+      contents: [{ parts: [{ text }] }],
+    });
+    return result.embeddings?.[0]?.values;
+  } catch (error) {
+    console.error("❌ Embedding Error:", error);
+    return undefined;
+  }
+};
+
 export const getAnswerFromContext = async (
   query: string,
   contextChunks: Chunk[],

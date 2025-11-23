@@ -3,7 +3,7 @@ import React, { useState, useCallback } from 'react';
 import type { Document, Chunk, ChatMessage } from './types';
 import { MessageSender } from './types';
 import { chunkText, retrieveRelevantChunks } from './utils/textProcessor';
-import { getAnswerFromContext } from './services/geminiService';
+import { getAnswerFromContext, getEmbedding } from './services/geminiService';
 import {
   saveDocuments,
   loadDocuments,
@@ -160,6 +160,16 @@ const App: React.FC = () => {
         // Create chunks with proper structure
         const docChunks = chunkText(docId, file.name, text);
         console.log(`Created ${docChunks.length} chunks for ${file.name}`);
+
+        // Generate embeddings for chunks
+        console.log(`Generating embeddings for ${file.name}...`);
+        for (const chunk of docChunks) {
+          const embedding = await getEmbedding(chunk.content);
+          if (embedding) {
+            chunk.embedding = embedding;
+          }
+        }
+
         newChunks.push(...docChunks);
       } catch (error) {
         console.error(`Error processing ${file.name}:`, error);
@@ -220,7 +230,11 @@ const App: React.FC = () => {
 
     // Retrieve relevant chunks
     console.log(`Searching ${chunks.length} chunks for: "${message}"`);
-    const relevantChunks = retrieveRelevantChunks(message, chunks);
+
+    // Generate query embedding
+    const queryEmbedding = await getEmbedding(message);
+
+    const relevantChunks = retrieveRelevantChunks(message, chunks, 5, queryEmbedding);
     console.log(`Found ${relevantChunks.length} relevant chunks`);
 
     let botResponseText: string;

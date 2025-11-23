@@ -6,15 +6,16 @@ Zen Assistant is a powerful, privacy-focused personal AI agent that helps you le
 
 -   **Multi-Format Support**: Upload and chat with PDF, DOCX, TXT, MD, and EML files.
 -   **Long-Term Memory**: Your documents and chat history are saved automatically using IndexedDB.
+-   **Semantic Search**: Zen understands the *meaning* of your queries using vector embeddings, not just keyword matching.
 -   **Context-Aware**: Zen remembers your conversation context, allowing for natural follow-up questions.
 -   **Email Integration**: Easily import emails from Gmail and Outlook (via .eml export).
 -   **Privacy First**: File processing happens locally in your browser. No documents are sent to a backend server.
--   **Smart Retrieval**: Uses intelligent chunking and keyword matching to find relevant information.
 
 ## 🛠️ Tech Stack
 
 -   **Frontend**: React 19, Vite, TypeScript
 -   **AI Model**: Google Gemini 2.0 Flash (via `@google/genai`)
+-   **Embeddings**: Google Gemini Text Embedding 004
 -   **Storage**: IndexedDB (via `idb`)
 -   **File Processing**: `pdfjs-dist` (PDF), `mammoth` (DOCX)
 -   **Styling**: Tailwind CSS (via utility classes)
